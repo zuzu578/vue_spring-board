@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC " -//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.mymy.mymy.Dao.memberCheckDao">
+	
+	<!-- user Login check  -->
+	<select id="UserCheckLogin" resultType="int"> 
+	SELECT
+    count(*) FROM my_mvc_board_user_table
+    WHERE user_id  = #{param1} AND user_password = #{param2}
+	
+	</select>
+	
+	</mapper>

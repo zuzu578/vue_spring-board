@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC " -//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.mymy.mymy.Dao.SnsUserData">
+	
+	<!-- user Login check  -->
+	<insert id="insertSnSUserData"> 
+		INSERT INTO SNS_USERDATA (nickname, profile_image, thumbnail_image, birthday , gender ,tokenNumber,email) 
+		VALUES (#{param1},#{param2},#{param3},#{param4},#{param5},#{param6},#{param7})
+	</insert>
+	<select id="selectUserData" resultType="com.mymy.mymy.Dto.SnsUserData">
+		SELECT * FROM SNS_USERDATA WHERE TOKENNUMBER = #{param1}
+	
+	</select>
+	<delete id="tokenDelete">
+	DELETE SNS_USERDATA WHERE TOKENNUMBER =#{param1}
+	
+	</delete>
+	</mapper>
