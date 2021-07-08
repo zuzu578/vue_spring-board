@@ -1,6 +1,7 @@
 # vue_spring-board
 
 # vue - spring legacy 를 이용한 게시판
+최대한 jsp
 
 1) crud 
 2) 게시물 검색 
