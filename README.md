@@ -1,7 +1,7 @@
 # vue_spring-board
 
 # vue - spring legacy 를 이용한 게시판
-최대한 jsp
+최대한 jsp 를 사용안하고 vue 로만 구현하려고 노력했습니다.
 
 1) crud 
 2) 게시물 검색 
