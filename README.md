@@ -7,3 +7,5 @@
 3) kakao oauth 로그인 
 4) 페이징기능
 5) oauth 인증 후 마이페이지 view
+6) 파일첨부 (cors로 인해 보류) 
+7) 
