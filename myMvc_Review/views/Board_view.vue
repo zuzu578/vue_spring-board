@@ -17,15 +17,51 @@
     <small>조회수 : {{user.bHit}}</small>
     </div>
     <div class="board_content">
-    <small>{{user.bContent}}</small>
+        <!-- <img src="./resources/assets/img/${imgUrl}"> -->
+    {{user.bContent}}
     </div>
+    <div class="contents_image_area" v-if="user.file_image==null">
+      <small> <!-- 이미지가 없는 게시물일 경우 아무런 이미지를 표시하지 않습니다.--> </small>
+        
+     </div>
+     <div class="render" v-else>
+    <img v-bind:src="'http://localhost:8082/mymy/resources/assets/img/'+user.file_image">
+    </div>
+    
     <div class="btnWrap">
 <button type="button" @click="doModify()" id="modify" class="btn btn-primary"><a :href="'/modify_view?bId=' + user.bId" >수정</a></button>
 <button type="button" @click="doDelete()" id ="delete" class="btn btn-dark">삭제</button>
 </div>	
 </div>
+ 
+<div class="board_reply_view_area">
+    <h4> 댓글 목록 </h4>
+    <div class="reply_view" v-for="(reply, idx) in replyData" :key="idx">
+        <div class="user_name">
+        {{reply.reply_user}}
+        </div>
+        <div class="content">
+        {{reply.reply_content}}
+        </div>
+        <div class="content_date">
+        {{reply.reply_date}}
+        </div>
+    </div>
+</div>
+<div class="board_reply_area">
+    <h3> 댓글달기 </h3>
+<div class="input-group mb-3">
+  <input type="text" v-model= "Reply_user" ref="Reply_user" class="form-control" placeholder="닉네임" aria-label="Username" aria-describedby="basic-addon1">
+</div>
+<div class="form-floating">
+  <textarea class="form-control"  v-model= "Reply_content" ref="Reply_content" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+  <label for="floatingTextarea">Comments</label>
+</div>
+<div class="button_area">
+<button type="button" @click="doReply()" class="btn btn-info">작성</button>
+</div>
+</div>
 </template>
-
 <script>
 
 import axios from 'axios'
@@ -39,6 +75,15 @@ return {
     ,bId:this.$route.query.bId // => 게시물 시퀀스 
     ,boardData : ''
     ,bName :''
+    ,Reply_content:''
+    ,Reply_user:''
+    ,getReply_content:''
+    ,getReply_user:''
+    ,getReply_dateTime:''
+    ,replyData:''
+    ,getImageFile:''
+    ,
+
     }
  }
 ,created() {
@@ -49,6 +94,22 @@ return {
     같은 옵션 처리를 완료합니다. 그
     러나 마운트가 시작되지 않았으므로 $el 속성을 아직 사용할 수 없습니다.
 */
+// 인스턴스 작성된 후 , 댓글 list 불러오기 
+//getReply
+let bId = this.bId;
+
+axios.get('http://localhost:8082/mymy/getReply',{
+        params:{
+            bId:bId,
+        }
+    })
+    .then((res)=>{
+        //if success! //
+        console.log(res);
+        this.replyData = res.data;
+        console.log(this.replyData);
+    })
+
 
 }
 
@@ -56,9 +117,50 @@ return {
     // mounted 
     console.log("get mounted! ");
     //get mounted() ;
-this.fnGetView();
+    // mounted 되었을때 게시물 상세보기 작동.
+    this.fnGetView();
 }
 ,methods:{
+//댓글작성
+doReply(){
+    var check = this.accessToken;
+   
+    //해당 게시글 번호 에 대한 댓글 작성 
+    var bId = this.bId;
+    var Reply_content = this.Reply_content
+    console.log("Reply_content =============>" +Reply_content);
+    var Reply_user = this.Reply_user;
+    console.log("Reply_user==================>"+Reply_user);
+    if(!Reply_user){
+        alert("작성자를 입력해주세요.");
+        return false;
+    }
+    if(!Reply_content){
+        alert("내용을 입력해주세요.");
+        return false;
+    }
+     if(!check){
+        alert("로그인 후 이용해주세요.");
+        return false;
+    }
+    //writeReply
+    axios.get('http://localhost:8082/mymy/writeReply',{
+        params:{
+            bId:bId,
+            Reply_content:this.Reply_content,
+            Reply_user:this.Reply_user,
+
+        }
+    })
+    .then((res)=>{
+        //if success! //
+        console.log(res);
+    })
+    alert("댓글작성 완료!");
+    window.location.reload();
+    
+
+ }, 
 //게시물 상세 내용 보기 
 //get board List 
 fnGetView() {
@@ -82,6 +184,8 @@ fnGetView() {
         this.boardData =res.data;
         console.log("boardData!!!"+ this.boardData);
         console.log("bName ===>" + res.data.bName);
+        this.getImageFile = res.data;
+        console.log("file_image======>" + this.getImageFile);
         /*
         ,bName:'' // => 사용자 이름
         ,bTitle:'' // => 제목 
@@ -130,7 +234,7 @@ return false;
             console.log("promise ====> success DataList")
         }else{
             alert("삭제되었습니다.");
-            window.location.href = "/";
+            window.location.href = "/home?pageNum=1";
         }
     })
   }
@@ -148,11 +252,42 @@ doModify(){
         return false;
     }
 }
+
   }
  }
 </script>
 
 <style scoped>
+
+.reply_view{
+    border:1px solid black;
+    text-align: left;
+    display:flex;
+    justify-content: space-between;
+}
+.board_reply_view_area{
+    margin-bottom:1000px;
+    margin-top:20px;
+    width:1000px;
+    margin:0 auto;
+    
+
+
+}
+.button_area{
+    float:left;
+}
+.board_reply_area{
+    width: 1000px;
+    margin: 0 auto;
+}
+.form-floating{
+    /*
+    width:1000px;
+    margin-top:20px;
+    margin:0 auto;
+    */
+}
 a{
 text-decoration: none;
 color:white;
@@ -199,6 +334,12 @@ margin-top:100px;
 .btnWrap{
 text-align: right;
 margin-top:150px;
+}
+.board_reply_area{
+    margin-top:50px;
+    margin-bottom:200px;
+
+
 }
 @import 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css';
 </style>
