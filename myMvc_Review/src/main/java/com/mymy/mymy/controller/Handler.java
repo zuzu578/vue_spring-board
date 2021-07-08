@@ -1,5 +1,7 @@
 package com.mymy.mymy.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,24 +14,119 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.mymy.mymy.Dao.Dao;
+import com.mymy.mymy.Dao.ReplyDao;
 import com.mymy.mymy.Dao.SnsUserData;
 import com.mymy.mymy.Dao.memberCheckDao;
 import com.mymy.mymy.Dto.Dto;
+import com.mymy.mymy.Dto.ReplyDto;
 
 @Controller
 public class Handler
 {
 	@Autowired
 	private SqlSession sqlSession;
+	// file attachement server path 
+	private static final String FILE_SERVER_PATH =  "/Users/helloworld/eclipse-workspace/myMvc_Review/src/main/webapp/resources/assets/img";
+	private String fileName;
+	private String userName;
 	
-	static String userName ;
 	@RequestMapping("/home")
 	public String home() 
 	{
 		return "home";
+	}
+	@RequestMapping("/image")
+	public String image(HttpServletRequest req , Model model) {
+		System.out.println("Content_view_Start!");
+		int bId = 223;
+		System.out.println("bId ===>"+ bId);
+		Dao dao = sqlSession.getMapper(Dao.class);
+		ArrayList<Dto> dtos= dao.ContentView(bId);
+		model.addAttribute("dtos",dtos);
+		return "imageShowExample";
+	}
+	//댓글 갯수 count 
+	@RequestMapping(value = "replyCount" , method = RequestMethod.GET)
+	@ResponseBody
+	public String replyCount(HttpServletRequest req , Model model) {
+		System.out.println("reply count start! =======> ");
+		String bId = req.getParameter("bId");
+		ReplyDao dao = sqlSession.getMapper(ReplyDao.class);
+		
+		return "";
+	}
+	//파일이 없는경우 통신 
+	@RequestMapping(value="/Dowrite",method = RequestMethod.POST)
+	@ResponseBody
+	public String Dowrite(HttpServletRequest req, Model model)
+	{
+		System.out.println("Dowrite Start! ==============");
+		//view => paramter => handler 
+		String bTitle = req.getParameter("bTitle");
+		System.out.println(bTitle);
+		String bName =req.getParameter("bName");
+		System.out.println(bName);
+		String bContent = req.getParameter("bContent");
+		System.out.println(bContent);
+		//mybatis sqlSession (AutoWired)
+		Dao dao = sqlSession.getMapper(Dao.class);
+		dao.NofileWrite(bTitle,bName,bContent);
+		return "redirect:BoardList";
+		
+		
+	}
+	@RequestMapping(value="/boardWrite_ex",method = RequestMethod.GET)
+	public String boardWrite_ex() {
+		return "boardWrite_ex";
+	}
+	//!!vue 에서 이미지 첨부 기능 cors 오류로 인해 잠시 보류 jsp 로 해당 기능만 대체해버림 
+	@RequestMapping(value = "/doWriteF", method = RequestMethod.POST)
+	public String board_write_view(@RequestParam("FILE_IMAGE") MultipartFile file, ModelAndView mv,HttpServletRequest req, Model model) throws IOException {
+		//file 이 있는경우 
+		if(!file.getOriginalFilename().isEmpty()) {
+			file.transferTo(new File(FILE_SERVER_PATH, file.getOriginalFilename()));
+			String fileName = file.getOriginalFilename();
+			String f = fileName;
+		
+			System.out.println("fileName ====================>"+f);
+			Dao dao = sqlSession.getMapper(Dao.class);
+			System.out.println(file);
+			String BTITLE = req.getParameter("BTITLE");
+			String BNAME = req.getParameter("BNAME");
+			String BCONTENT = req.getParameter("BCONTENT");
+		    dao.Dowrite(BTITLE, BNAME, BCONTENT,f);
+			model.addAttribute("msg", "File uploaded successfully.");
+			//file 이 없는경우 
+		}else {
+			Dao dao = sqlSession.getMapper(Dao.class);
+			//String f = fileName;
+			String BTITLE = req.getParameter("BTITLE");
+			String BNAME = req.getParameter("BNAME");
+			String BCONTENT = req.getParameter("BCONTENT");
+		    dao.NofileWrite(BTITLE, BNAME, BCONTENT);
+			
+		}
+		return "redirect:http://localhost:8080/home?pageNum=1";
+	}
+	
+	
+	
+	//파일 첨부가 있는경우 통신
+	@RequestMapping(value = "/doWriteWithFile", method = RequestMethod.POST)
+	@ResponseBody
+	public String doWriteWithFile(MultipartFile file ,ModelAndView mv,
+				HttpServletRequest req, Model model) {
+		String fileName = req.getParameter("selectedFile");
+		System.out.println("selectedFile =========>"+file);
+		System.out.println("selectedFile =========>"+fileName);
+		
+		return "";
 	}
 	
 	//paging ==> get List 
@@ -88,12 +185,11 @@ public class Handler
 		//dao.upHit(bId);
 		//JSONParser parser = new JSONParser();
 		//Object obj = parser.parse( jsonStr );
-		model.addAttribute("ContentView",dtos);
+		
 		return dtos;
 		
-		
-		
 	}  
+	
 	
 	/*
 	@RequestMapping("/BoardList")
@@ -135,24 +231,24 @@ public class Handler
 	
 		return "BoardWrite_View";
 	}
-	//글쓰기양식에서 POST방식으로 전달된 data 를 DataBase 에 Access 해주기 한 함수
-	@RequestMapping(value="/Dowrite",method = RequestMethod.POST)
+	
+	//reply do 
+	@RequestMapping(value ="/writeReply", method = RequestMethod.GET)
 	@ResponseBody
-	public String Dowrite(HttpServletRequest req, Model model)
-	{
-		System.out.println("Dowrite Start! ==============");
-		//view => paramter => handler 
-		String bTitle = req.getParameter("bTitle");
-		System.out.println(bTitle);
-		String bName =req.getParameter("bName");
-		System.out.println(bName);
-		String bContent = req.getParameter("bContent");
-		System.out.println(bContent);
-		//mybatis sqlSession (AutoWired)
-		Dao dao = sqlSession.getMapper(Dao.class);
-		dao.Dowrite(bTitle,bName,bContent);
-		return "redirect:BoardList";
+	public String writeReply(HttpServletRequest req, Model model) {
+		System.out.println("writeReply_start");
+		String bId = req.getParameter("bId");
+		String Reply_content = req.getParameter("Reply_content");
+		String Reply_user = req.getParameter("Reply_user");
+		System.out.println("bId=======> reply " + bId);
+		System.out.println("Reply_content===========> reply"+ Reply_content);
+		System.out.println("Reply_user =============> reply "+ Reply_user);
+	    ReplyDao dao = sqlSession.getMapper(ReplyDao.class);
+		dao.doReply(Reply_user,Reply_content , bId);
+		System.out.println("댓글이 입력 됨");
 		
+		
+		return "";
 		
 	}
 	// kakao 로그인 정보 저장 
@@ -195,6 +291,19 @@ public class Handler
 		return dtos;
 		
 	}
+	//댓글 list 조회하기 
+	@RequestMapping(value="/getReply")
+	@ResponseBody
+	public ArrayList<ReplyDto> getReply(HttpServletRequest req ,Model model){
+		String bId = req.getParameter("bId");
+		System.out.println("getReply =========> " + bId);
+		ReplyDao dao = sqlSession.getMapper(ReplyDao.class);
+		ArrayList<ReplyDto> dtos = dao.getReply(bId);
+		System.out.println("process success! =====> get Reply ");
+		return dtos;
+		
+	}
+	
 	//카카오 로그아웃후 , 토큰 삭제 
 	@RequestMapping(value="/deleteToken")
 	@ResponseBody
