@@ -18,10 +18,14 @@
 <textarea class="form-control" v-model= "bContent" ref="bContent" placeholder="내용을 입력하세요." id="floatingTextarea2" style="height: 100px"></textarea>
 <label for="floatingTextarea2">내용</label>
 </div> 
+<div class="input-group">
+    <!-- image upload input -->
+  <input type="file" ref="image" name="image" accept="image/*" multiple="multiple" @change="uploadImage" class="form-control"  id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+</div>
 <div class="btnWrap">
 <a href="javascript:;" @click="fnList" class="btn">목록</a>
-<a v-if="!num" href="javascript:;" @click="fnAddProc" class="btnAdd btn">등록</a>
-<a v-else href="javascript:;" @click="fnModProc" class="btnAdd btn">수정</a>
+<a  @click="fnAddProc" class="btnAdd btn">등록</a>
+
 </div>	
 </div>
 
@@ -40,6 +44,8 @@ data() {
         ,bContent:''
         ,body:this.$route.query 
         ,form:'' //form 전송 데이터
+        ,image:'' //image 첨부 
+        ,selectedFile: null
         
     }
 }
@@ -49,13 +55,22 @@ data() {
     }
 }
 ,methods:{
+    uploadImage(event){
+      //this.selectedFile = this.$refs['image'].files[0];
+      // event // 
+      console.log(event);
+      this.selectedFile = event.target.files[0];
+      console.log(this.selectedFile);
+      console.log(this.selectedFile.name);
+    },
     fnList(){
         delete this.body.num;
         this.$router.push({path:'./',query:this.body});
         
     }
-    //게시물 작성하기
+    
     ,fnGetView() {
+        
         axios.get('http://localhost:8082/mymy/Dowrite'+this.body.num,{params:this.body})
         .then((res)=>{
             this.bTitle = res.data.bTitle[0];
@@ -69,6 +84,7 @@ data() {
     ,fnView() {
         this.$router.push({path:'./view',"query":this.body});
     }	
+    //게시물 작성 
     ,fnAddProc() {
         if(!this.bTitle) {
             alert("제목을 입력해 주세요");
@@ -100,70 +116,84 @@ data() {
         params.append('bTitle',bTitle);
         params.append('bName',bName);
         params.append('bContent',bContent);
-        
         console.log("bTitle=====>" + bTitle)
         console.log("bName=====>" + bName)
         console.log("bContent=====>" + bContent)
-        console.log('http://192.168.0.52:8082/mymy/Dowrite',params);
-        axios.post('http://localhost:8082/mymy/Dowrite',params)
+        console.log("선택된 이미지 파일 =====>" + this.selectedFile);
+        const formData = new FormData();
+        formData.append('bTitle',bTitle);
+        formData.append('bName',bName);
+        formData.append('bContent',bContent);
+        if(this.selectedFile != null){
+          formData.append('selectedFile',this.selectedFile,this.selectedFile.name);
+        }
+           console.log(formData);
         /*
-        크롬 종료
-        open "/Applications/Google Chrome.app" --disable-web-security
-        터미널 접속
-        보안 해제 flag 설정 및 사용 디렉토리 지정하여 크롬 실행 --args disable-web-security 로 보안을 해제해줘야 한다.
+        axios({
+         method: "post",
+        url: "http://localhost:8082/mymy/Dowrite",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+        })
         */
-        // 'http://localhost:8082/mymy/Dowrite';
-        .then((res)=>{
+       //파일이 없는경우 
+        if(this.selectedFile == null){
+       
+        axios.post('http://localhost:8082/mymy/Dowrite',formData,{
+           /*
+           headers:{
+
+                'Content-Type': 'multipart/form-data',
+                 'processData': false
+                ,'contentType': false
+            }
+            */
+           
+        })
+         .then((res)=>{
             if(res.data.success) {
-                //alert('등록되었습니다.');
+                console.log("after transaction !! ======> "+ res);
                 this.fnList();
             } else {
                 alert("등록되었습니다.");
-                window.location.href = '/';
+                window.location.href = '/home?pageNum=1';
             }
         })
         .catch((err)=>{
             console.log(err);
         })
-        
-    }
-    ,fnModProc() {
-        if(!this.bTitle) {
-            alert("제목을 입력해 주세요");
-            this.$refs.bTitle.focus(); //방식으로 선택자를 찾는다.
-            return false;
-        }
-        if(!this.bName){
-            alert("닉네임을 입력해주세요");
-            this.$refs.bName.focus();
-            return false;
-        }
-        if(!this.bContent){
-            alert("내용을 입력해주세요");
-            this.$$refs.bContent.focus();
-            return false;
-            
-        }
+     }else{
+         //만약 파일 이 있는경우 이쪽 url 로 통신합니다. 
+         console.log("파일 있음 감지.");
+         axios.post('http://localhost:8082/mymy/doWriteWithFile',formData,{
+           
+           headers:{
 
-        this.form = {
-            bTitle:this.bTitle
-            ,bName:this.bName
-            ,bContent:this.bContent
-        },
-        
-axios.put('http://localhost:8082/mymy/Dowrite',this.form)
-        .then((res)=>{
+                'Content-Type': 'multipart/form-data',
+                 'processData': false
+                ,'contentType': false
+            }
+            
+           
+        })
+         .then((res)=>{
             if(res.data.success) {
-                alert('수정되었습니다.');
-                this.fnView();
+                console.log("after transaction !! ======> "+ res);
+               // this.fnList();
             } else {
-                alert("실행중 실패했습니다.\n다시 이용해 주세요");
+                alert("등록되었습니다.");
+                window.location.href = '/home?pageNum=1';
             }
         })
         .catch((err)=>{
             console.log(err);
         })
+     }
+        
+       
+        
     }
+  
 }	
 }	
 
