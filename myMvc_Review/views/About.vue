@@ -9,6 +9,7 @@
           <div class="user_info">
           <div class="user_name">
            유저 이름: {{user.nickname}}
+          
           </div>
           <div class="user_gender">
              유저 성별: {{user.gender}}
@@ -18,12 +19,15 @@
           </div>
           <div class="user_email">
             유저 이메일 : {{user.email}}
+             <input type="hidden" v-model= user.email ref="email_hidden"  name="email_hidden" id="email_hidden">
           </div>
               
           </div>
 
     </div>
-  
+    <div class="sign_up">
+    <button type="button" @click="doSignUp" class="btn btn-outline-dark">회원가입하기</button>
+    </div>
   </div>
 </template>
 <script>
@@ -55,12 +59,38 @@ export default {
 
     
 
+    },
+    doSignUp(){
+      var user_email = document.getElementById("email_hidden").value;
+      //alert(checkSignUp)
+      // user email select 후 , 중복되는 이메일 있는경우 중복 회원가입 막기
+       axios.get('http://localhost:8082/mymy/CheckCountUser',{
+                    params: {
+                    user_email,   
+            }
+             })
+             .then((res)=>{ 
+              console.log(res);
+              console.log("data select count");   
+              if(res.data == '1'){
+                alert("이미 회원가입한 유저입니다.");
+                return false;
+              }else{
+                window.location.href ='/doSignUp';
+              }
+         })
+        
+      
     }
 
   }
 }
 </script>
 <style scoped>
+.sign_up{
+  margin-top:100px;
+
+}
 .board_view_area{
   align-items: center;
   justify-content: center;
