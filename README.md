@@ -44,8 +44,7 @@
  #refresh token vs access token 
   리프레시 토큰은 유효기간 2주 정도 , access token은 1시간 정도 수시로 access토큰의 고유값이 바뀝니다.
   
-  
-#후기 ...
+# 후기 ...
 최대한 jsp 를 사용안하고 vue 로만 구현하려고 노력했습니다.
 1) crud 
 2) 게시물 검색 
