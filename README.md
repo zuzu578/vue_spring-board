@@ -51,7 +51,7 @@ https://developers.kakao.com/docs/latest/ko/kakaologin/common
  # kakao Oauth token 
   기존 jsp 로 개발 하였을땐 http session 을 이용하여 해당 세션을 저장하여 로그인을 유지하였는데 , kakao oauth 로그인을 하게되면 카카오 에서 해당 Refresh token , access token 
   을 발급하게 됩니다. 이 토큰을 통해 토큰을 저장하여 세션을 유지하는 방법을 사용합니다.
- #refresh token vs access token 
+ # refresh token vs access token 
   리프레시 토큰은 유효기간 2주 정도 , access token은 1시간 정도 수시로 access토큰의 고유값이 바뀝니다.
 # axios 에 대한 이야기 , promise / callback 
  Axios는 브라우저, Node.js를 위한 Promise API를 활용하는 HTTP 비동기 통신 라이브러리입니다.
