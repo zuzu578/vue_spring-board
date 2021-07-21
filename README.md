@@ -33,7 +33,7 @@ https://developers.kakao.com/docs/latest/ko/kakaologin/common
   교차 출처 리소스 공유(Cross-Origin Resource Sharing, CORS)는 추가 HTTP 헤더를 사용하여, 한 출처에서 실행 중인 웹 애플리케이션이 다른 출처의 선택한 자원에 접근할 수 있는 권한을   부여하도록 브라우저에 알려주는 체제입니다. 웹 애플리케이션은 리소스가 자신의 출처(도메인, 프로토콜, 포트)와 다를 때 교차 출처 HTTP 요청을 실행합니다.
   때문에 서로다른 port 를 가진 서버가 통신하므로 보안때문에 cors를 막아놓아서 cors오류가 발생하게 됩니다. 그러므로 서버단에서 허용을 해주면 됩니다. 
 
-  # 게시판 기능 
+  # 이미지 첨부 기능! 
   <img width="1090" alt="스크린샷 2021-07-21 오후 1 43 24" src="https://user-images.githubusercontent.com/69393030/126432167-9cd2f3ea-3a06-4bb4-9cf0-34db750a0fa9.png">
   이미지 첨부 기능 을 추가했습니다.
   
