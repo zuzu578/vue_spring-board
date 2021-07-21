@@ -1,3 +1,4 @@
+<img width="913" alt="스크린샷 2021-07-21 오후 1 53 34" src="https://user-images.githubusercontent.com/69393030/126432957-4f87e6f9-6712-4908-94fc-7be550f90230.png">
 # vue_spring-board
 
 # vue - spring legacy 를 이용한 게시판
@@ -8,6 +9,9 @@ https://developers.kakao.com/docs/latest/ko/kakaologin/common
 <img width="729" alt="스크린샷 2021-07-21 오후 1 50 40" src="https://user-images.githubusercontent.com/69393030/126432745-6d4e2eb5-fe0f-41ba-84ff-6ab3f4bae17f.png">
 카카오 oauth를 이용하기 위해서는 사용하는 redirect url 을 등록해주어야 합니다.
 <img width="552" alt="스크린샷 2021-07-21 오후 1 51 19" src="https://user-images.githubusercontent.com/69393030/126432791-496d0947-fbf2-43a6-aa41-c8cdf24dfee6.png">
+# 카카오 user Data 정보 info 
+<img width="913" alt="스크린샷 2021-07-21 오후 1 54 14" src="https://user-images.githubusercontent.com/69393030/126433002-9c3c503f-b929-43d8-b58d-c67a23d893b1.png">
+
 
 # 주의사항!
  스프링 legacy(sts 3.0)버전에서는 cors 오류 발생시 @(어노테이션) 으로 허용해주는방법이 없기때문에 filter 에 Cors 오류를 위해 추가 해줍니다. 
